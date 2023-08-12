@@ -1,8 +1,16 @@
+import 'package:adventure/pixel_adventure.dart';
+import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Flame.device.fullScreen();
+  Flame.device.setLandscape();
+
+  final game = PixelAdventure();
   runApp(GameWidget(
-    game: FlameGame(),
+    game: kDebugMode ? PixelAdventure() : game,
   ));
 }
