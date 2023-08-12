@@ -1,30 +1,27 @@
 import 'dart:async';
 
+import 'package:adventure/actors/player_utils.dart';
 import 'package:adventure/pixel_adventure.dart';
 import 'package:flame/components.dart';
-
-enum PlayerCharacter { maskDude, ninjaFrog, pinkMan }
-
-extension PlayerCharacterX on PlayerCharacter {
-  String get name {
-    switch (this) {
-      case PlayerCharacter.maskDude:
-        return "Mask Dude";
-      case PlayerCharacter.ninjaFrog:
-        return "Ninja Frog";
-      case PlayerCharacter.pinkMan:
-        return "Pink Man";
-    }
-  }
-}
-
-enum PlayerStates { idle, running, jump, doubleJump, wallJump, fall, hit }
+import 'package:flutter/services.dart';
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameRef<PixelAdventure> {
-  Player({position, required this.character}) : super(position: position);
+    with HasGameRef<PixelAdventure>, KeyboardHandler {
+  Player({
+    this.character = PlayerCharacter.maskDude,
+    this.direction = PlayerDirection.none,
+    this.moveSpeed = 100,
+    Vector2? velocity,
+    position,
+  }) : super(position: position) {
+    this.velocity = velocity ?? Vector2.zero();
+  }
 
   final PlayerCharacter character;
+
+  late PlayerDirection direction;
+  late double moveSpeed;
+  late Vector2 velocity;
 
   late final SpriteAnimation idleAnimation;
   late final SpriteAnimation runningAnimation;
@@ -39,6 +36,42 @@ class Player extends SpriteAnimationGroupComponent
   FutureOr<void> onLoad() {
     _loadAllAnimations();
     return super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+    _updatePlayerMovement(dt);
+    super.update(dt);
+  }
+
+  @override
+  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    final isLeftKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyA);
+    final isRightKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyD);
+
+    if (isLeftKeyPressed == isRightKeyPressed) {
+      direction = PlayerDirection.none;
+    } else {
+      direction =
+          isLeftKeyPressed ? PlayerDirection.left : PlayerDirection.right;
+    }
+    return super.onKeyEvent(event, keysPressed);
+  }
+
+  void _updatePlayerMovement(double dt) {
+    var dx = 0.0;
+    var dy = 0.0;
+    dx += moveSpeed * direction.delta;
+    if (dx == 0) {
+      current = PlayerStates.idle;
+    } else {
+      current = PlayerStates.running;
+      if (dx > 0 == isFlippedHorizontally) {
+        flipHorizontallyAroundCenter();
+      }
+    }
+    velocity = Vector2(dx, dy);
+    position += velocity * dt;
   }
 
   void _loadAllAnimations() {

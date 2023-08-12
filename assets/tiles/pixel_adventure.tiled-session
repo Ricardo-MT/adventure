@@ -9,11 +9,25 @@
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "Level-1.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
             "scale": 1.4249999999999998,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 320.3508771929825,
-                "y": 184.2105263157895
+                "x": 319.2982456140351,
+                "y": 183.15789473684214
+            }
+        },
+        "Level-2.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 1.4249999999999998,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 320.70175438596493,
+                "y": 188.77192982456143
             }
         },
         "Pixel Adventure.tsx": {
