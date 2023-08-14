@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:adventure/actors/player.dart';
-import 'package:adventure/actors/player_utils.dart';
+import 'package:adventure/controller/joystick.dart';
 import 'package:adventure/levels/level.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -20,7 +20,7 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
 
   @override
   FutureOr<void> onLoad() async {
-    showJoystick = true;
+    showJoystick = false;
     await images.loadAllImages();
     player = Player();
     world = Level(levelName: 'Level-1', player: player);
@@ -53,21 +53,8 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
   }
 
   void _updateJoystick() {
-    switch (joystick.direction) {
-      case JoystickDirection.left:
-      case JoystickDirection.upLeft:
-      case JoystickDirection.downLeft:
-        player.direction = PlayerDirection.left;
-        break;
-      case JoystickDirection.right:
-      case JoystickDirection.upRight:
-      case JoystickDirection.downRight:
-        player.direction = PlayerDirection.right;
-        break;
-      case JoystickDirection.idle:
-        player.direction = PlayerDirection.none;
-        break;
-      default:
-    }
+    final joystickVector = joystick.direction;
+    player.horizontalMovement = joystickVector.x;
+    // player.verticalMovement = joystickVector.y;
   }
 }

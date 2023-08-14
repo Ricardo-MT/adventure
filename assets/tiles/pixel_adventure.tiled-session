@@ -3,8 +3,9 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "Level-1.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -13,10 +14,10 @@
                 2
             ],
             "scale": 1.4249999999999998,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 319.2982456140351,
-                "y": 183.15789473684214
+                "x": 318.2456140350877,
+                "y": 182.1052631578948
             }
         },
         "Level-2.tmx": {
@@ -42,6 +43,7 @@
     "map.tileWidth": 16,
     "map.width": 40,
     "openFiles": [
+        "Level-1.tmx"
     ],
     "project": "pixel_adventure.tiled-project",
     "recentFiles": [
