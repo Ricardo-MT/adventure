@@ -8,7 +8,8 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
-class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents {
+class PixelAdventure extends FlameGame
+    with HasKeyboardHandlerComponents, HasCollisionDetection {
   late final CameraComponent cam;
   late final Level world;
   late JoystickComponent joystick;

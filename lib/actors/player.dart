@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:adventure/actors/player_hitbox.dart';
 import 'package:adventure/actors/player_utils.dart';
+import 'package:adventure/collectible/fruit.dart';
 import 'package:adventure/components/collision_block.dart';
 import 'package:adventure/controller/keyboard.dart';
 import 'package:adventure/pixel_adventure.dart';
@@ -11,7 +12,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameRef<PixelAdventure>, KeyboardHandler {
+    with HasGameRef<PixelAdventure>, KeyboardHandler, CollisionCallbacks {
   Player({
     this.character = PlayerCharacter.maskDude,
     this.moveSpeed = 100,
@@ -62,6 +63,14 @@ class Player extends SpriteAnimationGroupComponent
         position: Vector2(hitbox.x, hitbox.y),
         size: Vector2(hitbox.width, hitbox.height)));
     return super.onLoad();
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is CollectibleFruit) {
+      other.collideWithPlayer(this);
+    }
+    super.onCollision(intersectionPoints, other);
   }
 
   @override

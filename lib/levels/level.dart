@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:adventure/actors/player.dart';
 import 'package:adventure/background/background_tile.dart';
+import 'package:adventure/collectible/fruit.dart';
 import 'package:adventure/components/collision_block.dart';
 import 'package:adventure/pixel_adventure.dart';
 import 'package:flame/components.dart';
@@ -14,11 +15,13 @@ class Level extends World with HasGameRef<PixelAdventure> {
     required this.player,
   }) {
     collisionBlocks = [];
+    collectibleObjects = [];
   }
   late String levelName;
   late TiledComponent level;
   late Player player;
   late List<CollisionBlock> collisionBlocks;
+  late List<CollectibleFruit> collectibleObjects;
 
   @override
   FutureOr<void> onLoad() async {
@@ -27,6 +30,7 @@ class Level extends World with HasGameRef<PixelAdventure> {
     _initiateBackgroundScrolling(level);
     _addSpawninPoints(level);
     _addCollisionObjects(level);
+    _addCollectibleObjects(level);
     return super.onLoad();
   }
 
@@ -81,5 +85,22 @@ class Level extends World with HasGameRef<PixelAdventure> {
       }
     }
     player.collisionBlocks = collisionBlocks;
+  }
+
+  void _addCollectibleObjects(TiledComponent<FlameGame> world) {
+    final collectiblePoints =
+        world.tileMap.getLayer<ObjectGroup>('Collectibles');
+    if (collectiblePoints != null) {
+      for (var point in (collectiblePoints.objects)) {
+        if (point.class_ == "Fruit") {
+          final fruit = CollectibleFruit(
+            position: Vector2(point.x, point.y),
+            fruitAsset: point.name,
+          );
+          collectibleObjects.add(fruit);
+          add(fruit);
+        }
+      }
+    }
   }
 }
