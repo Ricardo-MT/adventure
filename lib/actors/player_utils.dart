@@ -13,4 +13,22 @@ extension PlayerCharacterName on PlayerCharacter {
   }
 }
 
-enum PlayerStates { idle, running, jump, doubleJump, wallJump, fall, hit }
+enum PlayerStates {
+  idle,
+  running,
+  jump,
+  doubleJump,
+  wallJump,
+  fall,
+  hit,
+  appearing,
+  dissapearing,
+}
+
+extension PlayerStatesX on PlayerStates {
+  bool get isFrozen => [
+        PlayerStates.appearing,
+        PlayerStates.dissapearing,
+        PlayerStates.hit
+      ].contains(this);
+}

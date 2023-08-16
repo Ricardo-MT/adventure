@@ -6,7 +6,6 @@ import 'package:adventure/actors/player_hitbox.dart';
 import 'package:adventure/pixel_adventure.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/sprite.dart';
 
 final _random = Random();
 const minU = 0.04;
@@ -29,7 +28,6 @@ class CollectibleFruit extends SpriteAnimationGroupComponent
   String fruitAsset;
   late final SpriteAnimation idleAnimation;
   late final SpriteAnimation collectedAnimation;
-  late SpriteAnimationTicker ticker;
   late final double stepTime;
 
   late final FruitHitbox hitbox;

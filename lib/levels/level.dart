@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adventure/actors/enemy.dart';
 import 'package:adventure/actors/player.dart';
 import 'package:adventure/background/background_tile.dart';
 import 'package:adventure/collectible/fruit.dart';
@@ -31,6 +32,7 @@ class Level extends World with HasGameRef<PixelAdventure> {
     _addSpawninPoints(level);
     _addCollisionObjects(level);
     _addCollectibleObjects(level);
+    _addTraps(level);
     return super.onLoad();
   }
 
@@ -62,6 +64,7 @@ class Level extends World with HasGameRef<PixelAdventure> {
         switch (point.class_) {
           case 'Player':
             player.position = Vector2(point.x, point.y);
+            player.respawnPosition = Vector2(point.x, point.y);
             add(player);
             break;
           default:
@@ -92,13 +95,40 @@ class Level extends World with HasGameRef<PixelAdventure> {
         world.tileMap.getLayer<ObjectGroup>('Collectibles');
     if (collectiblePoints != null) {
       for (var point in (collectiblePoints.objects)) {
-        if (point.class_ == "Fruit") {
-          final fruit = CollectibleFruit(
+        switch (point.class_) {
+          case "Fruit":
+            final fruit = CollectibleFruit(
+              position: Vector2(point.x, point.y),
+              fruitAsset: point.name,
+            );
+            collectibleObjects.add(fruit);
+            add(fruit);
+            break;
+          default:
+        }
+      }
+    }
+  }
+
+  void _addTraps(TiledComponent<FlameGame> world) {
+    final trapPoints = world.tileMap.getLayer<ObjectGroup>('Enemies');
+    if (trapPoints != null) {
+      for (var point in (trapPoints.objects)) {
+        if (point.class_ == "Saw") {
+          final offNeg =
+              point.properties.getProperty<Property<double>>("offNeg")?.value;
+          final offPos =
+              point.properties.getProperty<Property<double>>("offPos")?.value;
+          final isHorizontal =
+              point.properties.getProperty<Property<bool>>("horizontal")?.value;
+          final trap = Trap(
             position: Vector2(point.x, point.y),
-            fruitAsset: point.name,
+            size: Vector2(point.width, point.height),
+            offNeg: offNeg ?? 0,
+            offPos: offPos ?? 0,
+            isHorizontal: isHorizontal ?? false,
           );
-          collectibleObjects.add(fruit);
-          add(fruit);
+          add(trap);
         }
       }
     }
