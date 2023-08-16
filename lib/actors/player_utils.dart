@@ -23,6 +23,7 @@ enum PlayerStates {
   hit,
   appearing,
   dissapearing,
+  won,
 }
 
 extension PlayerStatesX on PlayerStates {
@@ -30,5 +31,8 @@ extension PlayerStatesX on PlayerStates {
         PlayerStates.appearing,
         PlayerStates.dissapearing,
         PlayerStates.hit
+      ].contains(this);
+  bool get hasWon => [
+        PlayerStates.won,
       ].contains(this);
 }

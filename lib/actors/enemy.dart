@@ -46,7 +46,7 @@ class Trap extends SpriteAnimationGroupComponent
   @override
   FutureOr<void> onLoad() {
     priority = -1;
-    debugMode = true;
+    debugMode = false;
     _loadAllAnimations();
     add(CircleHitbox(
       position: Vector2(hitbox.x, hitbox.y),

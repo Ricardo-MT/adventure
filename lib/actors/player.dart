@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:adventure/actors/enemy.dart';
 import 'package:adventure/actors/player_hitbox.dart';
 import 'package:adventure/actors/player_utils.dart';
+import 'package:adventure/collectible/checkpoint.dart';
 import 'package:adventure/collectible/fruit.dart';
 import 'package:adventure/components/collision_block.dart';
 import 'package:adventure/controller/keyboard.dart';
@@ -25,6 +26,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
           position: position,
           anchor: Anchor.topLeft,
         ) {
+    current = PlayerStates.idle;
     this.velocity = velocity ?? Vector2.zero();
     this.respawnPosition = respawnPosition ?? Vector2.zero();
     this.collisionBlocks = collisionBlocks ?? [];
@@ -58,6 +60,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
   late final SpriteAnimation hitAnimation;
   late final SpriteAnimation appearAnimation;
   late final SpriteAnimation dissapearAnimation;
+  late final SpriteAnimation wonAnimation;
   final double stepTime = 0.05;
 
   @override
@@ -79,6 +82,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
     if (other is Trap) {
       collideWithTrap();
     }
+    if (other is Checkpoint) {
+      other.collideWithPlayer(this);
+    }
     super.onCollision(intersectionPoints, other);
   }
 
@@ -87,6 +93,16 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
     current = PlayerStates.hit;
     velocity.x = 0;
     horizontalMovement = 0;
+  }
+
+  void setHasWon() {
+    current = PlayerStates.won;
+    final tickers = animationTickers?.values ?? [];
+    for (var element in tickers) {
+      element.reset();
+    }
+    position -= (Vector2.all(32) + Vector2(-(scale.x * 16) + 16, 0));
+    scale.x = 1;
   }
 
   Future<void> _recoverFromHit() async {
@@ -108,17 +124,25 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
     _resetAnimation(PlayerStates.appearing);
   }
 
+  void _onWonCallback() async {
+    position = Vector2.all(-200);
+    await Future.delayed(const Duration(milliseconds: 1000));
+    game.nextLevel();
+  }
+
   void _resetAnimation(PlayerStates key) {
     animationTickers?[key]?.reset();
   }
 
   @override
   void update(double dt) {
-    _updatePlayerState(dt);
-    _updatePlayerMovement(dt);
-    _checkHorizontalCollisions();
-    _applyGravity(dt);
-    _checkVerticalCollisions();
+    if (!(current?.hasWon ?? false)) {
+      _updatePlayerState(dt);
+      _updatePlayerMovement(dt);
+      _checkHorizontalCollisions();
+      _applyGravity(dt);
+      _checkVerticalCollisions();
+    }
     super.update(dt);
   }
 
@@ -240,6 +264,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
     dissapearAnimation = _initiateSpecialAnimations(
       state: "Desappearing",
     );
+    wonAnimation = _initiateSpecialAnimations(
+      state: "Desappearing",
+    );
 
     animations = {
       PlayerStates.idle: idleAnimation,
@@ -251,6 +278,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
       PlayerStates.hit: hitAnimation,
       PlayerStates.appearing: appearAnimation,
       PlayerStates.dissapearing: dissapearAnimation,
+      PlayerStates.won: wonAnimation,
     };
     current = PlayerStates.idle;
     animationTickers?.forEach((key, value) {
@@ -262,6 +290,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerStates>
       }
       if (key == PlayerStates.dissapearing) {
         value.onComplete = _onDesappearCallback;
+      }
+      if (key == PlayerStates.won) {
+        value.onComplete = _onWonCallback;
       }
     });
   }

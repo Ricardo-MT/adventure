@@ -10,11 +10,13 @@ import 'package:flutter/material.dart';
 
 class PixelAdventure extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection {
-  late final CameraComponent cam;
-  late final Level world;
+  CameraComponent? cam;
+  Level? level;
+  Player? player;
+  late final List<String> worlds;
+  late int levelIndex;
   late JoystickComponent joystick;
   late bool showJoystick;
-  late Player player;
 
   @override
   Color backgroundColor() => const Color(0xFF211F30);
@@ -22,17 +24,16 @@ class PixelAdventure extends FlameGame
   @override
   FutureOr<void> onLoad() async {
     showJoystick = false;
+    levelIndex = -1;
     await images.loadAllImages();
-    player = Player();
-    world = Level(levelName: 'Level-1', player: player);
-    cam = CameraComponent.withFixedResolution(
-        width: 640, height: 360, world: world);
-    cam.viewfinder.anchor = Anchor.topLeft;
-    addAll([cam, world]);
+    worlds = [
+      'Level-1',
+      'Level-2',
+    ];
     if (showJoystick) {
       _addJoystick();
     }
-
+    nextLevel();
     return super.onLoad();
   }
 
@@ -42,6 +43,28 @@ class PixelAdventure extends FlameGame
       _updateJoystick();
     }
     super.update(dt);
+  }
+
+  void nextLevel() async {
+    levelIndex++;
+    if (levelIndex == worlds.length) return;
+    if (player != null) {
+      player?.removeFromParent();
+    }
+    if (level != null) {
+      level?.removeFromParent();
+    }
+    if (cam != null) {
+      cam?.removeFromParent();
+    }
+    await Future.delayed(const Duration(milliseconds: 1000));
+    player = Player();
+    level = Level(levelName: worlds[levelIndex], player: player!);
+    cam = CameraComponent.withFixedResolution(
+        width: 640, height: 360, world: level);
+
+    cam!.viewfinder.anchor = Anchor.topLeft;
+    addAll([cam!, level!]);
   }
 
   void _addJoystick() {
@@ -54,8 +77,8 @@ class PixelAdventure extends FlameGame
   }
 
   void _updateJoystick() {
-    final joystickVector = joystick.direction;
-    player.horizontalMovement = joystickVector.x;
+    final joystickVector = joystick.direction.vector;
+    player?.horizontalMovement = joystickVector.x;
     // player.verticalMovement = joystickVector.y;
   }
 }

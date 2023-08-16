@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:adventure/actors/enemy.dart';
 import 'package:adventure/actors/player.dart';
 import 'package:adventure/background/background_tile.dart';
+import 'package:adventure/collectible/checkpoint.dart';
 import 'package:adventure/collectible/fruit.dart';
 import 'package:adventure/components/collision_block.dart';
 import 'package:adventure/pixel_adventure.dart';
@@ -33,6 +34,7 @@ class Level extends World with HasGameRef<PixelAdventure> {
     _addCollisionObjects(level);
     _addCollectibleObjects(level);
     _addTraps(level);
+    _addCheckpoints(level);
     return super.onLoad();
   }
 
@@ -130,6 +132,19 @@ class Level extends World with HasGameRef<PixelAdventure> {
           );
           add(trap);
         }
+      }
+    }
+  }
+
+  void _addCheckpoints(TiledComponent<FlameGame> world) {
+    final checkpoints = world.tileMap.getLayer<ObjectGroup>('Checkpoints');
+    if (checkpoints != null) {
+      for (var point in (checkpoints.objects)) {
+        final checkpoint = Checkpoint(
+          position: Vector2(point.x, point.y),
+          size: Vector2(point.width, point.height),
+        );
+        add(checkpoint);
       }
     }
   }
